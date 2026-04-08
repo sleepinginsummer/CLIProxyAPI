@@ -284,6 +284,7 @@ func (s *Service) applyCoreAuthAddOrUpdate(ctx context.Context, auth *coreauth.A
 	// immediately for API calls, rather than waiting for model registration to complete.
 	op := "register"
 	var err error
+	hadExplicitModelStates := len(auth.ModelStates) > 0
 	if existing, ok := s.coreManager.GetByID(auth.ID); ok {
 		auth.CreatedAt = existing.CreatedAt
 		if !existing.Disabled && existing.Status != coreauth.StatusDisabled && !auth.Disabled && auth.Status != coreauth.StatusDisabled {
@@ -312,7 +313,9 @@ func (s *Service) applyCoreAuthAddOrUpdate(ctx context.Context, auth *coreauth.A
 	// This operation may block on network calls, but the auth configuration
 	// is already effective at this point.
 	s.registerModelsForAuth(auth)
-	s.coreManager.ReconcileRegistryModelStates(ctx, auth.ID)
+	if !hadExplicitModelStates {
+		s.coreManager.ReconcileRegistryModelStates(ctx, auth.ID)
+	}
 
 	// Refresh the scheduler entry so that the auth's supportedModelSet is rebuilt
 	// from the now-populated global model registry. Without this, newly added auths

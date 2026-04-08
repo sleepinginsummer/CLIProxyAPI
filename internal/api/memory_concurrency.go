@@ -138,6 +138,9 @@ func (l *memoryConcurrencyLimiter) applyConfig(cfg config.MemoryConcurrencyConfi
 	nextLimit := cfg.InitialConcurrency
 	if l.limit > 0 {
 		nextLimit = l.limit
+		if cfg.InitialConcurrency > nextLimit {
+			nextLimit = cfg.InitialConcurrency
+		}
 	}
 	if nextLimit < cfg.MinConcurrency {
 		nextLimit = cfg.MinConcurrency
