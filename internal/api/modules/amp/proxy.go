@@ -108,7 +108,7 @@ func createReverseProxy(upstreamURL string, secretSource SecretSource) (*httputi
 	// Modify incoming responses to handle gzip without Content-Encoding
 	// This addresses the same issue as inline handler gzip handling, but at the proxy level
 	proxy.ModifyResponse = func(resp *http.Response) error {
-		// Only process successful responses
+		// Preserve non-2xx upstream responses as-is.
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 			return nil
 		}

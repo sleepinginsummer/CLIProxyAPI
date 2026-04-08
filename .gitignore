@@ -33,6 +33,7 @@ GEMINI.md
 
 # Tooling metadata
 .vscode/*
+.worktrees/
 .codex/*
 .claude/*
 .gemini/*
@@ -41,7 +42,6 @@ GEMINI.md
 .gopath/*
 .serena/*
 .agent/*
-.agents/*
 .agents/*
 .opencode/*
 .idea/*
@@ -52,3 +52,9 @@ _bmad-output/*
 # macOS
 .DS_Store
 ._*
+
+# Opencode
+.beads/
+.opencode/
+.cli-proxy-api/
+.venv/

@@ -77,14 +77,18 @@ func (s *SimHashSelector) Pick(ctx context.Context, provider, model string, opts
 	s.prunePoolLocked(auths, now)
 	poolMembers, outsiders := s.partitionAvailableLocked(available)
 
-	if len(s.pool.members) < s.effectivePoolSizeLocked() && len(outsiders) > 0 {
+	if len(s.pool.members) < s.effectivePoolSizeLocked() && len(outsiders) > 0 &&
+		(!s.pool.everFilled || now.Sub(s.pool.lastAdmittedAt) >= s.admitCooldownLocked()) {
 		admitted := s.pickAdmissionCandidateLocked(now, outsiders)
 		if admitted != nil {
+			wasFilled := s.pool.everFilled
 			s.pool.members[admitted.ID] = struct{}{}
 			if s.pool.preferredOutsiderID == admitted.ID {
 				s.pool.preferredOutsiderID = ""
 			}
-			s.pool.lastAdmittedAt = now
+			if wasFilled {
+				s.pool.lastAdmittedAt = now
+			}
 			if len(s.pool.members) >= s.effectivePoolSizeLocked() {
 				s.pool.everFilled = true
 			}
